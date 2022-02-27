@@ -33,7 +33,13 @@ Trapezoid& Trapezoid::operator=(const Trapezoid& other) {
     len_da = other.len_da;
     std::cout << "Trapezoid copied" << std::endl;
     return *this;  
-} 
+}
+
+std::ostream& operator<<(std::ostream& os, const Trapezoid& obj){
+    os << obj.len_ab <<" " << obj.len_bc << " " << obj.len_cd << " " << obj.len_da;
+    return os; 
+}
+
 bool Trapezoid::operator==(const Trapezoid& other) {
     if (this->len_ab == other.len_ab &&
         this->len_bc == other.len_bc &&

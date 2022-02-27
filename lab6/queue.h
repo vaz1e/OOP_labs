@@ -1,23 +1,26 @@
 #ifndef TQUEUE_H
 #define TQUEUE_H
 
-#include "queueitem.h"
+#include <iostream>
 #include <memory>
+#include "queueitem.h"
 
-template <typename T> class TQueue {
+template <class T>
+class TQueue
+{
 public:
     TQueue();
-    TQueue(const TQueue& other);
-    void Push(std::shared_ptr<T> &&trapezoid);
-    void Pop();
-    std::shared_ptr<T>& Top();
-    bool Empty();
-    size_t Length();
-    template <class A> friend std::ostream& operator<<(std::ostream& os, const TQueue<A>& queue);
-    void Clear();
     virtual ~TQueue();
+    void Push(const T &item);
+    void Pop();
+    T &Top();
+    bool IsEmpty() const;
+    uint32_t GetSize() const;
+    template <class A> friend std::ostream& operator<<(std::ostream &os, const TQueue<A> &stack);
+
 private:
-    std::shared_ptr<TQueueItem<T>> head, tail;
+    TQueueItem<T> *head;
+    uint32_t count;
 };
 
-#endif // TQUEUE_H
+#endif

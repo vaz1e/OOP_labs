@@ -1,40 +1,43 @@
 #include "allocationblock.h"
-#include <memory>
-TAllocationBlock::TAllocationBlock(size_t size, size_t count) {
-    _used_blocks = (char *)malloc(size * count);
-    for (int32_t i = 0; i < count; ++i) {
-        void *ptr = (void *)malloc(sizeof(void *));
-        ptr = _used_blocks + i * size;
-        _free_blocks.Push(std::make_shared<void*>(ptr));
+#include <iostream>
+
+TAllocationBlock::TAllocationBlock(size_t size, size_t count): _size(size), _count(count)
+{
+    _used_blocks = (char*)malloc(size * count);
+    for (size_t i = 0; i < count; i++) {
+        _free_blocks.Push(_used_blocks + i * size);
     }
+    _free_count = count;
+    std::cout << "Memory init" << "\n";
 }
 
-void *TAllocationBlock::allocate() {
-    if (!_free_blocks.Empty()) {
-        void *res = *(_free_blocks.Top());
-        int32_t first = 1;
-        _free_blocks.Pop();
-        std::cout << "Trapezoid created" << std::endl;
-        return res;
-    } else {
-        throw std::bad_alloc();
+void* TAllocationBlock::allocate()
+{
+    void* result = nullptr;
+    if (_free_count == 0) {
+        std::cout << "No memory exception\n" << "\n";
+        return result;
     }
+    result = _free_blocks.Top();
+    _free_blocks.Pop();
+    --_free_count;
+    std::cout << "Allocate " << (_count - _free_count) << "\n";
+    return result;
 }
 
-void TAllocationBlock::deallocate(void *ptr) {
-    _free_blocks.Push(std::make_shared<void*>(ptr));
+void TAllocationBlock::deallocate(void* pointer)
+{
+    _free_blocks.Push(pointer);
+    ++_free_count;
+    std::cout << "Deallocated block\n";
 }
 
-bool TAllocationBlock::has_free_blocks() {
-    return _free_blocks.Empty();
+bool TAllocationBlock::has_free_blocks()
+{
+    return _free_count > 0;
 }
 
-
-TAllocationBlock::~TAllocationBlock() {
-    while (!_free_blocks.Empty()) {
-        int32_t first = 1;
-        _free_blocks.Pop();
-    }
+TAllocationBlock::~TAllocationBlock()
+{
     free(_used_blocks);
-    std::cout << "Rectangle deleted" << std::endl;
 }
